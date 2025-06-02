@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APARTMENTS</title>
+    <link rel="stylesheet" href="static/estilo.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .button-group,
+        .age-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .option-button,
+        .age-button,
+        .predict-button {
+            padding: 10px;
+            border: none;
+            background-color: #ddd;
+            cursor: pointer;
+            border-radius: 5px;
+            flex: 1 1 calc(20% - 10px);
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .option-button.active,
+        .age-button.active {
+            background-color: #2d89ef;
+            color: white;
+        }
+
+        .select-field,
+        .input-field {
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .predict-button {
+            background-color: #28a745;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .result {
+            padding: 15px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            text-align: center;
+            font-size: 1.2rem;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .option-button,
+            .age-button {
+                flex: 1 1 100%;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.2rem;
+            }
+
+            .predict-button {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form action="{{ url_for('predict')}}" method="post" onsubmit="return validateForm(event)">
+            <h1>Averigua el precio de tu futuro apartamento</h1>
+
+            <!-- Área -->
+            <div class="form-group">
+                <label class="form-label">Área (m²)</label>
+                <input type="number" name="area" id="area" class="input-field" placeholder="1000" required>
+            </div>
+
+            <!-- Habitaciones -->
+            <div class="form-group">
+                <label class="form-label">Habitaciones</label>
+                <input type="hidden" name="habitaciones" id="habitaciones_value">
+                <div class="button-group">
+                    <button type="button" class="option-button" data-value="Habitaciones_1.0" onclick="selectOption(this, 'habitaciones_value')">1</button>
+                    <button type="button" class="option-button" data-value="Habitaciones_2.0" onclick="selectOption(this, 'habitaciones_value')">2</button>
+                    <button type="button" class="option-button" data-value="Habitaciones_3.0" onclick="selectOption(this, 'habitaciones_value')">3</button>
+                    <button type="button" class="option-button" data-value="Habitaciones_4.0" onclick="selectOption(this, 'habitaciones_value')">4</button>
+                    <button type="button" class="option-button" data-value="Habitaciones_5.0" onclick="selectOption(this, 'habitaciones_value')">5</button>
+                </div>
+            </div>
+
+            <!-- Baños -->
+            <div class="form-group">
+                <label class="form-label">Baños</label>
+                <input type="hidden" name="bath" id="bath_value">
+                <div class="button-group">
+                    <button type="button" class="option-button bath-btn" data-value="Baños_1.0" onclick="selectOption(this, 'bath_value')">1</button>
+                    <button type="button" class="option-button bath-btn" data-value="Baños_2.0" onclick="selectOption(this, 'bath_value')">2</button>
+                    <button type="button" class="option-button bath-btn" data-value="Baños_3.0" onclick="selectOption(this, 'bath_value')">3</button>
+                    <button type="button" class="option-button bath-btn" data-value="Baños_4.0" onclick="selectOption(this, 'bath_value')">4</button>
+                    <button type="button" class="option-button bath-btn" data-value="Baños_5.0" onclick="selectOption(this, 'bath_value')">5</button>
+                </div>
+            </div>
+
+            <!-- Antigüedad -->
+            <div class="form-group">
+                <label class="form-label">Antigüedad</label>
+                <input type="hidden" name="edad" id="edad_value">
+                <div class="age-buttons">
+                    <button type="button" class="age-button" data-value="Antigüedad_menor-a-1-anio" onclick="selectOption(this, 'edad_value')">< 1 año</button>
+                    <button type="button" class="age-button" data-value="Antigüedad_de-1-a-8-anios" onclick="selectOption(this, 'edad_value')">1-8 años</button>
+                    <button type="button" class="age-button" data-value="Antigüedad_de-9-a-15-anios" onclick="selectOption(this, 'edad_value')">9-15 años</button>
+                    <button type="button" class="age-button" data-value="Antigüedad_de-16-a-30-anios" onclick="selectOption(this, 'edad_value')">16-30 años</button>
+                    <button type="button" class="age-button" data-value="Antigüedad_mas-de-30-anios" onclick="selectOption(this, 'edad_value')">> 30 años</button>
+                </div>
+            </div>
+
+            <!-- Estrato -->
+            <div class="form-group">
+                <label class="form-label">Estrato</label>
+                <input type="hidden" name="estrato" id="estrato_value">
+                <div class="button-group">
+                    <button type="button" class="option-button estrato-btn" data-value="Estrato_2.0" onclick="selectOption(this, 'estrato_value')">2</button>
+                    <button type="button" class="option-button estrato-btn" data-value="Estrato_3.0" onclick="selectOption(this, 'estrato_value')">3</button>
+                    <button type="button" class="option-button estrato-btn" data-value="Estrato_4.0" onclick="selectOption(this, 'estrato_value')">4</button>
+                    <button type="button" class="option-button estrato-btn" data-value="Estrato_5.0" onclick="selectOption(this, 'estrato_value')">5</button>
+                    <button type="button" class="option-button estrato-btn" data-value="Estrato_6.0" onclick="selectOption(this, 'estrato_value')">6</button>
+                </div>
+            </div>
+
+            <!-- Parqueaderos -->
+            <div class="form-group parking-group">
+                <label class="form-label">Parqueaderos</label>
+                <input type="hidden" name="parqueaderos" id="parqueaderos_value">
+                <div class="button-group">
+                    <button type="button" class="option-button parking-btn" data-value="Parqueaderos_0.0" onclick="selectOption(this, 'parqueaderos_value')">0</button>
+                    <button type="button" class="option-button parking-btn" data-value="Parqueaderos_1.0" onclick="selectOption(this, 'parqueaderos_value')">1</button>
+                    <button type="button" class="option-button parking-btn" data-value="Parqueaderos_2.0" onclick="selectOption(this, 'parqueaderos_value')">2</button>
+                    <button type="button" class="option-button parking-btn" data-value="Parqueaderos_3.0" onclick="selectOption(this, 'parqueaderos_value')">3</button>
+                    <button type="button" class="option-button parking-btn" data-value="Parqueaderos_4.0" onclick="selectOption(this, 'parqueaderos_value')">4</button>
+                    <button type="button" class="option-button parking-btn" data-value="Parqueaderos_5.0" onclick="selectOption(this, 'parqueaderos_value')">5</button>
+                    <button type="button" class="option-button parking-btn" data-value="Parqueaderos_6.0" onclick="selectOption(this, 'parqueaderos_value')">6</button>
+                </div>
+            </div>
+
+            <!-- Localidad -->
+            <div class="form-group">
+                <label class="form-label">Localidad</label>
+                <select name="localidad" id="localidad" class="select-field" required>
+                    <option value="">Selecciona una localidad</option>
+                    <option value="LOCALIDAD_BARRIOS UNIDOS">BARRIOS UNIDOS</option>
+                    <option value="LOCALIDAD_BOSA">BOSA</option>
+                    <option value="LOCALIDAD_CHAPINERO">CHAPINERO</option>
+                    <option value="LOCALIDAD_CIUDAD BOLIVAR">CIUDAD BOLIVAR</option>
+                    <option value="LOCALIDAD_ENGATIVA">ENGATIVA</option>
+                    <option value="LOCALIDAD_FONTIBON">FONTIBON</option>
+                    <option value="LOCALIDAD_KENNEDY">KENNEDY</option>
+                    <option value="LOCALIDAD_PUENTE ARANDA">PUENTE ARANDA</option>
+                    <option value="LOCALIDAD_SANTAFE">SANTAFE</option>
+                    <option value="LOCALIDAD_SUBA">SUBA</option>
+                    <option value="LOCALIDAD_TEUSAQUILLO">TEUSAQUILLO</option>
+                    <option value="LOCALIDAD_USAQUEN">USAQUEN</option>
+                    <option value="LOCALIDAD_USME">USME</option>
+                </select>
+            </div>
+
+            <button type="submit" class="predict-button">Predecir Precio</button>
+
+            <div class="result" id="result">
+                {% if prediction_text %}
+                    <script>
+                        const rawPrediction = {{ prediction_text }};
+                        document.getElementById("result").innerText = "Precio estimado: $" + (rawPrediction / 10).toLocaleString();
+                    </script>
+                {% else %}
+                    Selecciona todas las opciones y presiona "Predecir Precio" para ver el resultado
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function selectOption(button, hiddenInputId) {
+            const buttons = button.parentElement.querySelectorAll('.option-button, .age-button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            document.getElementById(hiddenInputId).value = button.getAttribute('data-value');
+        }
+
+        function validateForm(event) {
+            const area = document.getElementById('area').value;
+            const habitaciones = document.getElementById('habitaciones_value').value;
+            const bath = document.getElementById('bath_value').value;
+            const edad = document.getElementById('edad_value').value;
+            const estrato = document.getElementById('estrato_value').value;
+            const parqueaderos = document.getElementById('parqueaderos_value').value;
+            const localidad = document.getElementById('localidad').value;
+
+            if (!area || !habitaciones || !bath || !edad || !estrato || !parqueaderos || !localidad) {
+                document.getElementById('result').innerHTML = '⚠️ Por favor, completa todos los campos';
+                event.preventDefault();
+                return false;
+            }
+
+            return true;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('result').style.display = 'flex';
+        });
+    </script>
+</body>
+</html>

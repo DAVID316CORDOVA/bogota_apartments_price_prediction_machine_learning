@@ -38,6 +38,8 @@ def predict():
     data_transformada = escalador_x.transform(data)
     prediccion_escalada = model.predict(data_transformada)
     prediccion_real = escalador_y.inverse_transform(prediccion_escalada.reshape(-1, 1))
+    
+    prediccion_real=prediccion_real/10
 
     return render_template('home.html', prediction_text=f"Precio en COP: ${prediccion_real[0][0]:,.0f}")
 
