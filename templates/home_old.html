@@ -5,109 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>APARTMENTS</title>
     <link rel="stylesheet" href="static/estilo.css">
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        h1 {
-            font-size: 1.5rem;
-            text-align: center;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .button-group,
-        .age-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .option-button,
-        .age-button,
-        .predict-button {
-            padding: 10px;
-            border: none;
-            background-color: #ddd;
-            cursor: pointer;
-            border-radius: 5px;
-            flex: 1 1 calc(20% - 10px);
-            min-width: 80px;
-            text-align: center;
-        }
-
-        .option-button.active,
-        .age-button.active {
-            background-color: #2d89ef;
-            color: white;
-        }
-
-        .select-field,
-        .input-field {
-            padding: 10px;
-            font-size: 1rem;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        .predict-button {
-            background-color: #28a745;
-            color: white;
-            font-weight: bold;
-            font-size: 1rem;
-        }
-
-        .result {
-            padding: 15px;
-            border: 1px solid #ccc;
-            background-color: #f8f9fa;
-            text-align: center;
-            font-size: 1.2rem;
-            border-radius: 5px;
-        }
-
-        @media (max-width: 600px) {
-            .option-button,
-            .age-button {
-                flex: 1 1 100%;
-            }
-
-            .container {
-                padding: 10px;
-            }
-
-            h1 {
-                font-size: 1.2rem;
-            }
-
-            .predict-button {
-                font-size: 1rem;
-            }
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -156,6 +53,12 @@
                     <button type="button" class="age-button" data-value="Antigüedad_de-9-a-15-anios" onclick="selectOption(this, 'edad_value')">9-15 años</button>
                     <button type="button" class="age-button" data-value="Antigüedad_de-16-a-30-anios" onclick="selectOption(this, 'edad_value')">16-30 años</button>
                     <button type="button" class="age-button" data-value="Antigüedad_mas-de-30-anios" onclick="selectOption(this, 'edad_value')">> 30 años</button>
+
+
+                  
+
+
+
                 </div>
             </div>
 
@@ -211,26 +114,26 @@
             <button type="submit" class="predict-button">Predecir Precio</button>
 
             <div class="result" id="result">
-                {% if prediction_text %}
-                    <script>
-                        const rawPrediction = {{ prediction_text }};
-                        document.getElementById("result").innerText = "Precio estimado: $" + (rawPrediction / 10).toLocaleString();
-                    </script>
-                {% else %}
-                    Selecciona todas las opciones y presiona "Predecir Precio" para ver el resultado
-                {% endif %}
+                {{prediction_text if prediction_text else 'Selecciona todas las opciones y presiona "Predecir Precio" para ver el resultado'}}
             </div>
         </form>
     </div>
 
     <script>
+        // Función para manejar la selección de botones
         function selectOption(button, hiddenInputId) {
+            // Remover clase active de todos los botones del mismo grupo
             const buttons = button.parentElement.querySelectorAll('.option-button, .age-button');
             buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Agregar clase active al botón seleccionado
             button.classList.add('active');
+            
+            // Actualizar el valor del input oculto
             document.getElementById(hiddenInputId).value = button.getAttribute('data-value');
         }
 
+        // Función para validar el formulario antes de enviarlo
         function validateForm(event) {
             const area = document.getElementById('area').value;
             const habitaciones = document.getElementById('habitaciones_value').value;
@@ -239,17 +142,20 @@
             const estrato = document.getElementById('estrato_value').value;
             const parqueaderos = document.getElementById('parqueaderos_value').value;
             const localidad = document.getElementById('localidad').value;
-
+            
+            // Validar que todos los campos estén llenos
             if (!area || !habitaciones || !bath || !edad || !estrato || !parqueaderos || !localidad) {
                 document.getElementById('result').innerHTML = '⚠️ Por favor, completa todos los campos';
                 event.preventDefault();
                 return false;
             }
-
+            
+            // Si todo está completo, permitir el envío del formulario
             return true;
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
+        // Mostrar la caja de resultado al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('result').style.display = 'flex';
         });
     </script>
